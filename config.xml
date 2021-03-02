@@ -3,7 +3,7 @@
     <tizen:application id="dMsNuVOUiZ.SourcepointCMP" package="dMsNuVOUiZ" required_version="2.3" launch_mode="single"/>
     <content src="index.html"/>
     <feature name="http://tizen.org/feature/screen.size.all"/>
-    <icon src="download.png"/>
+    <icon src="icon.png"/>
     <name>SourcepointCMP</name>
     <tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
