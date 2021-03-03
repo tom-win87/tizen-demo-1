@@ -11,6 +11,7 @@ function Navigation (options) {
     }
     this.activeGroup = 'cards-row';
     this.activeElement = null;
+    this.enterEvent = null;
     this.tvKey = {
         KEY_ENTER: 13,          //
         KEY_PAUSE: 19,          // MediaPause
@@ -129,14 +130,14 @@ Navigation.prototype = {
                             count: count
                         };
                     }
-                    this.active_ott_card.node.focus();
+                    this.activeElement = this.active_ott_card.node;
                 } else {
                     btn_count = this.active_controls_btns.count > 0 ? --this.active_controls_btns.count : control_buttons.length - 1;
                     this.active_controls_btns = {
                         node: control_buttons[btn_count],
                         count: btn_count
                     }
-                    this.active_controls_btns.node.focus()
+                    this.activeElement = this.active_controls_btns.node;
                 }
                 break;
             case 'right':
@@ -153,17 +154,18 @@ Navigation.prototype = {
                             count: count
                         };
                     }
-                    this.active_ott_card.node.focus();
+                    this.activeElement = this.active_ott_card.node;
                 } else {
                     btn_count = this.active_controls_btns.count < control_buttons.length - 1 ? ++this.active_controls_btns.count : 0;
                     this.active_controls_btns = {
                         node: control_buttons[btn_count],
                         count: btn_count
                     }
-                    this.active_controls_btns.node.focus()
+                    this.activeElement = this.active_controls_btns.node;
                 }
                 break;
         }
+        this.activeElement.focus();
     },
     /**
      * Crawls over the certain elements group that will be
@@ -174,17 +176,26 @@ Navigation.prototype = {
         switch (direction) {
             case 'up':
                 this.activeGroup = 'cards-row';
-                this.getViewportContent().querySelectorAll('.ott-card')[0].focus();
+                this.activeElement = this.getViewportContent().querySelectorAll('.ott-card')[0];
                 break;
             case 'down':
                 this.activeGroup = 'controls-row';
-                this.getViewportContent().querySelectorAll('.message-row .focusable')[0].focus();
+                this.activeElement = this.getViewportContent().querySelectorAll('.message-row .focusable')[0];
                 break;
         }
+        this.activeElement.focus();
     },
+    /**
+     * Dispatch enter button event on active DOM element
+     */
     triggerClick: function(){
         if (!this.activeElement) return
-        this.activeElement.click();
+        if (!this.enterEvent) {
+            this.enterEvent = new Event('keydown', {'bubbles': true, 'cancelable': true});
+            this.enterEvent.keyCode = 13;
+        }
+        this.activeElement.dispatchEvent(this.enterEvent);
+        // this.activeElement.click();
     },
     /**
      * Opens a provided URL in default browser of the TV.

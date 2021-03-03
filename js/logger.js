@@ -10,7 +10,6 @@ function Logger(options) {
     this.loggerContainer = document.createElement('div');
     this.hide_time = options['hideTime'] || false;
     this.opened = false;
-    this.ctrlDown = false;
 
     this.init();
 }
