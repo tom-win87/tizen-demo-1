@@ -1,6 +1,6 @@
 function Navigation (options) {
     options = options ? options : {};
-    this.viewportModal = options.viewport || '#sp_message_iframe_393148';
+    this.viewportModal = options.viewport || "[id^='sp_message_iframe_']";
     this.active_ott_card = {
         node: null,
         count: 0
