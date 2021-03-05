@@ -1,16 +1,8 @@
 function Navigation (options) {
     options = options ? options : {};
     this.viewportModal = options.viewport || "[id^='sp_message_iframe_']";
-    this.active_ott_card = {
-        node: null,
-        count: 0
-    };
-    this.active_controls_btns = {
-        node: null,
-        count: 0
-    }
-    this.activeGroup = 'cards-row';
     this.activeElement = null;
+    this.activeElementCount = 0;
     this.enterEvent = null;
     this.tvKey = {
         KEY_ENTER: 13,          //
@@ -73,122 +65,63 @@ Navigation.prototype = {
     onLoad: function () {
         this.registerAllKey();
         this.bindEvents();
-
-        this.markupMainPageContent();
     },
 
     getViewportContent: function () {
         return document.querySelector(this.viewportModal).contentWindow.document;
     },
 
-    markupMainPageContent: function () {
-        let that = this;
-        setTimeout(function () {
-            let ottCards = that.getViewportContent().querySelectorAll('.ott-card');
-            [].forEach.call(ottCards, function(el, i){
-                el.classList.add('focusable');
-                el.dataset.elementGroup = 'cards-row';
-            });
-        }, 2000);
-    },
-
-    handleEvent: function (direction) {
+    handleMoveEvent: function (direction) {
+        const tabindexedElements = this.getViewportContent().querySelectorAll("[tabindex='-1']");
         switch (direction) {
             case 'up':
             case 'down':
-                this.moveVertically(direction);
+                this.moveVertically(tabindexedElements, direction);
                 break;
             case 'left':
             case 'right':
-                this.moveHorizontally(direction);
+                this.moveHorizontally(tabindexedElements, direction);
                 break;
         }
     },
     /**
-     * Crawls over the certain elements group that will be
-     * set for selector in it's `data-element-group` attribute
+     * Crawls over the certain elements that have
+     * tabindex attribute setted as `-1`
      */
-    moveHorizontally: function(direction){
+    moveHorizontally: function(elems, direction){
         logger.debug('moveHorizontally', direction);
-        const ott_cards = this.getViewportContent().querySelectorAll('.ott-card');
-        const control_buttons = this.getViewportContent().querySelectorAll('.message-row .focusable');
-        const LAST_COUNT = ott_cards.length - 1;
-        let count, btn_count = 0;
-
-        switch (direction) {
-            case 'left':
-                if(this.activeGroup === 'cards-row') {
-                    if (!this.active_ott_card.node) {
-                        this.active_ott_card = {
-                            node: ott_cards[0],
-                            count: 0
-                        };
-                    } else {
-                        count = this.active_ott_card.count > 0 ? --this.active_ott_card.count : LAST_COUNT;
-                        this.active_ott_card = {
-                            node: ott_cards[count],
-                            count: count
-                        };
-                    }
-                    this.activeElement = this.active_ott_card.node;
-                } else {
-                    btn_count = this.active_controls_btns.count > 0 ? --this.active_controls_btns.count : control_buttons.length - 1;
-                    this.active_controls_btns = {
-                        node: control_buttons[btn_count],
-                        count: btn_count
-                    }
-                    this.activeElement = this.active_controls_btns.node;
-                }
-                break;
-            case 'right':
-                if(this.activeGroup === 'cards-row') {
-                    if (!this.active_ott_card.node) {
-                        this.active_ott_card = {
-                            node: ott_cards[0],
-                            count: 0
-                        };
-                    } else {
-                        count = this.active_ott_card.count < LAST_COUNT ? ++this.active_ott_card.count : 0;
-                        this.active_ott_card = {
-                            node: ott_cards[count],
-                            count: count
-                        };
-                    }
-                    this.activeElement = this.active_ott_card.node;
-                } else {
-                    btn_count = this.active_controls_btns.count < control_buttons.length - 1 ? ++this.active_controls_btns.count : 0;
-                    this.active_controls_btns = {
-                        node: control_buttons[btn_count],
-                        count: btn_count
-                    }
-                    this.activeElement = this.active_controls_btns.node;
-                }
-                break;
+        // If (for some reason) no elements to move to then exit
+        if (!elems) return
+        const LAST_COUNT = elems.length - 1;
+        if (direction === 'left'){
+            this.activeElementCount = this.activeElementCount > 0 ? --this.activeElementCount : LAST_COUNT;
+        } else {
+            this.activeElementCount = this.activeElementCount < LAST_COUNT ? ++this.activeElementCount : 0;
         }
+        this.activeElement = elems[this.activeElementCount];
         this.activeElement.focus();
     },
     /**
      * Crawls over the certain elements group that will be
      * set for selector in it's `data-element-group` attribute
      */
-    moveVertically: function (direction) {
+    moveVertically: function (elems, direction) {
         logger.debug('moveVertically', direction);
-        switch (direction) {
-            case 'up':
-                this.activeGroup = 'cards-row';
-                this.activeElement = this.getViewportContent().querySelectorAll('.ott-card')[0];
-                break;
-            case 'down':
-                this.activeGroup = 'controls-row';
-                this.activeElement = this.getViewportContent().querySelectorAll('.message-row .focusable')[0];
-                break;
+        if(direction === 'up') {
+            this.activeElement = elems[0];
+            this.activeElementCount = 0;
+        } else {
+            const LAST_COUNT = elems.length - 1;
+            this.activeElement = elems[LAST_COUNT];
+            this.activeElementCount = LAST_COUNT;
         }
         this.activeElement.focus();
     },
     /**
-     * Dispatch enter button event on active DOM element
+     * Dispatch enter button event on an active DOM element
      */
     triggerClick: function(){
+        logger.debug('enterButtonClickHandler');
         if (!this.activeElement) return
         if (!this.enterEvent) {
             this.enterEvent = new Event('keydown', {'bubbles': true, 'cancelable': true});
@@ -247,23 +180,22 @@ Navigation.prototype = {
 
         switch (event.keyCode) {
             case tileNavigation.tvKey.KEY_LEFT:
-                tileNavigation.handleEvent('left')
+                tileNavigation.handleMoveEvent('left')
                 break;
 
             case tileNavigation.tvKey.KEY_RIGHT:
-                tileNavigation.handleEvent('right')
+                tileNavigation.handleMoveEvent('right')
                 break;
 
             case tileNavigation.tvKey.KEY_UP:
-                tileNavigation.handleEvent('up')
+                tileNavigation.handleMoveEvent('up')
                 break;
 
             case tileNavigation.tvKey.KEY_DOWN:
-                tileNavigation.handleEvent('down')
+                tileNavigation.handleMoveEvent('down')
                 break;
 
             case tileNavigation.tvKey.KEY_ENTER:
-                logger.debug('enterButtonClickHandler');
                 tileNavigation.triggerClick();
                 break;
 
@@ -282,7 +214,6 @@ Navigation.prototype = {
                 break;
         }
     },
-
 
     bindEvents: function() {
         window.addEventListener('keydown', this.onKeyDownPress);
