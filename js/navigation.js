@@ -1,16 +1,13 @@
 function Navigation (options) {
     options = options ? options : {};
     this.viewportModal = options.viewport || "[id^='sp_message_iframe_']";
-    this.activeElement = null;
-    this.activeElementCount = 0;
-    this.enterEvent = null;
     this.tvKey = {
-        KEY_ENTER: 13,          //
+        KEY_ENTER: 13,          // Enter
         KEY_PAUSE: 19,          // MediaPause
-        KEY_LEFT: 37,           //
-        KEY_UP: 38,             //
-        KEY_RIGHT: 39,          //
-        KEY_DOWN: 40,           //
+        KEY_LEFT: 37,           // ArrowLeft
+        KEY_UP: 38,             // ArrowUp
+        KEY_RIGHT: 39,          // ArrowRight
+        KEY_DOWN: 40,           // ArrowDown
         KEY_0: 48,              // 0
         KEY_1: 49,              // 1
         KEY_2: 50,              // 2
@@ -63,86 +60,42 @@ function Navigation (options) {
 
 Navigation.prototype = {
     onLoad: function () {
-        this.registerAllKey();
+        // this.registerAllKey();
         this.bindEvents();
     },
-
-    getViewportContent: function () {
-        return document.querySelector(this.viewportModal).contentWindow.document;
-    },
-
-    handleMoveEvent: function (direction) {
-        const tabindexedElements = this.getViewportContent().querySelectorAll("[tabindex='-1']");
-        switch (direction) {
-            case 'up':
-            case 'down':
-                this.moveVertically(tabindexedElements, direction);
-                break;
-            case 'left':
-            case 'right':
-                this.moveHorizontally(tabindexedElements, direction);
-                break;
-        }
+    /**
+      * Returns the window object of an iframe from options
+      */
+    getViewportWindow: function () {
+        return document.querySelector(this.viewportModal).contentWindow;
     },
     /**
-     * Crawls over the certain elements that have
-     * tabindex attribute setted as `-1`
-     */
-    moveHorizontally: function(elems, direction){
-        logger.debug('moveHorizontally', direction);
-        // If (for some reason) no elements to move to then exit
-        if (!elems) return
-        const LAST_COUNT = elems.length - 1;
-        if (direction === 'left'){
-            this.activeElementCount = this.activeElementCount > 0 ? --this.activeElementCount : LAST_COUNT;
-        } else {
-            this.activeElementCount = this.activeElementCount < LAST_COUNT ? ++this.activeElementCount : 0;
+      * Returns the active element of a page,
+      * regardless of shadow root or iframe window.
+      * @returns {HTMLElement}
+      */
+    getActiveElement: function (element = document.activeElement ) {
+        const shadowRoot = element.shadowRoot;
+        const contentDocument = element.contentDocument;
+        if (shadowRoot && shadowRoot.activeElement) {
+            return this.getActiveElement(shadowRoot.activeElement);
         }
-        this.activeElement = elems[this.activeElementCount];
-        this.activeElement.focus();
-    },
-    /**
-     * Crawls over the certain elements group that will be
-     * set for selector in it's `data-element-group` attribute
-     */
-    moveVertically: function (elems, direction) {
-        logger.debug('moveVertically', direction);
-        if(direction === 'up') {
-            this.activeElement = elems[0];
-            this.activeElementCount = 0;
-        } else {
-            const LAST_COUNT = elems.length - 1;
-            this.activeElement = elems[LAST_COUNT];
-            this.activeElementCount = LAST_COUNT;
+        if (contentDocument && contentDocument.activeElement) {
+            return this.getActiveElement(contentDocument.activeElement);
         }
-        this.activeElement.focus();
+        return element;
     },
     /**
      * Dispatch enter button event on an active DOM element
      */
     triggerClick: function(){
-        logger.debug('enterButtonClickHandler');
-        if (!this.activeElement) return
-        if (!this.enterEvent) {
-            this.enterEvent = new Event('keydown', {'bubbles': true, 'cancelable': true});
-            this.enterEvent.keyCode = 13;
+        const activeElement = this.getActiveElement();
+        let enterEvent = new Event('keydown', {bubbles: true, cancelable: true});
+        enterEvent.keyCode = this.tvKey.KEY_ENTER;
+        if (activeElement.style.cssText === 'font-weight: normal;'){
+            enterEvent = new KeyboardEvent('keypress',{key: 'Enter', bubbles: true, charCode: 0, keyCode: this.tvKey.KEY_ENTER});
         }
-        this.activeElement.dispatchEvent(this.enterEvent);
-        // this.activeElement.click();
-    },
-    /**
-     * Opens a provided URL in default browser of the TV.
-     */
-    launchBrowser: function (url) {
-        logger.debug('[launchBrowser] URL:', url);
-        let appControl = new window.tizen.ApplicationControl("http://tizen.org/appcontrol/operation/view", url);
-
-        window.tizen.application.launchAppControl(
-            appControl,
-            null,
-            function() {logger.debug("[launchBrowser] succeed callback"); },
-            function(e) {logger.debug("[launchBrowser] failed callback:", e.message); },
-            null );
+        activeElement.dispatchEvent(enterEvent);
     },
     /**
      * Registers all supported input device keys to receive DOM keyboard events
@@ -169,52 +122,35 @@ Navigation.prototype = {
     unregisterKey: function (keyName) {
         window.tizen.tvinputdevice.unregisterKey(keyName);
     },
-
     /**
      * Handles remotes key press event.
-     * Checks whether pressed button is registered or not and applies
-     * an action.
+     * Dispatch fired event to the iframe window.
      */
     onKeyDownPress: function(event) {
-        logger.debug('[onKeyDownPress] Pressed key code:' + event.keyCode);
-
+        // logger.debug('[onKeyDownPress] Pressed key code:' + event.keyCode);
+        // console.log('keydown', event);
         switch (event.keyCode) {
-            case tileNavigation.tvKey.KEY_LEFT:
-                tileNavigation.handleMoveEvent('left')
-                break;
-
-            case tileNavigation.tvKey.KEY_RIGHT:
-                tileNavigation.handleMoveEvent('right')
-                break;
-
-            case tileNavigation.tvKey.KEY_UP:
-                tileNavigation.handleMoveEvent('up')
-                break;
-
-            case tileNavigation.tvKey.KEY_DOWN:
-                tileNavigation.handleMoveEvent('down')
-                break;
-
             case tileNavigation.tvKey.KEY_ENTER:
                 tileNavigation.triggerClick();
                 break;
-
             case tileNavigation.tvKey.KEY_EXIT:
                 window.tizen.application.getCurrentApplication().exit();
                 break;
-
             case tileNavigation.tvKey.KEY_1:
                 logger.toolbarToggle();
                 break;
-
             case tileNavigation.tvKey.KEY_0:
                 window.location.reload();
                 break;
             default:
+                const iframeWindow = tileNavigation.getViewportWindow();
+                const evnt = new Event('keydown', {'bubbles': true, 'cancelable': true});
+                evnt.currentTarget = event.currentTarget;
+                evnt.keyCode = event.keyCode;
+                iframeWindow.dispatchEvent(evnt);
                 break;
         }
     },
-
     bindEvents: function() {
         window.addEventListener('keydown', this.onKeyDownPress);
     }
