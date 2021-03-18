@@ -60,14 +60,17 @@ function Navigation (options) {
 
 Navigation.prototype = {
     onLoad: function () {
-        // this.registerAllKey();
+        //this.registerAllKey();
+        this.registerKey('0');
+        this.registerKey('1');
         this.bindEvents();
     },
     /**
       * Returns the window object of an iframe from options
       */
     getViewportWindow: function () {
-        return document.querySelector(this.viewportModal).contentWindow;
+        const viewport = document.querySelector(this.viewportModal);
+        return !!viewport ? viewport.contentWindow : false;
     },
     /**
       * Returns the active element of a page,
@@ -129,9 +132,12 @@ Navigation.prototype = {
     onKeyDownPress: function(event) {
         // logger.debug('[onKeyDownPress] Pressed key code:' + event.keyCode);
         // console.log('keydown', event);
+        const iframeWindow = tileNavigation.getViewportWindow();
         switch (event.keyCode) {
             case tileNavigation.tvKey.KEY_ENTER:
-                tileNavigation.triggerClick();
+                if (!!iframeWindow) {
+                    tileNavigation.triggerClick();
+                }
                 break;
             case tileNavigation.tvKey.KEY_EXIT:
                 window.tizen.application.getCurrentApplication().exit();
@@ -143,11 +149,12 @@ Navigation.prototype = {
                 window.location.reload();
                 break;
             default:
-                const iframeWindow = tileNavigation.getViewportWindow();
-                const evnt = new Event('keydown', {'bubbles': true, 'cancelable': true});
-                evnt.currentTarget = event.currentTarget;
-                evnt.keyCode = event.keyCode;
-                iframeWindow.dispatchEvent(evnt);
+                if (!!iframeWindow){
+                    const evnt = new Event('keydown', {'bubbles': true, 'cancelable': true});
+                    evnt.currentTarget = event.currentTarget;
+                    evnt.keyCode = event.keyCode;
+                    iframeWindow.dispatchEvent(evnt);
+                }
                 break;
         }
     },

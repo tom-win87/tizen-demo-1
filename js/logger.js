@@ -1,15 +1,15 @@
 function Logger(options) {
+    options = options ? options : {};
     this.debugMode = options.debugMode || false;
     this.loggerStyles = {
         top: options.top || 0,
         left: options.left || 0,
         font_size: options.fontSize || '16px'
     };
-    this.parentContainer = options['parentContainer'] || document.body;
+    this.parentContainer = options.parentContainer || document.body;
     this.headContainer = document.head || document.getElementsByTagName('head')[0];
     this.loggerContainer = document.createElement('div');
-    this.hide_time = options['hideTime'] || false;
-    this.opened = false;
+    this.hide_time = options.hideTime || false;
 
     this.init();
 }
@@ -91,7 +91,6 @@ Logger.prototype = {
     },
 
     toolbarToggle: function () {
-        this.opened = !this.opened;
         this.loggerContainer.classList.toggle('hidden');
         this.scrollToBottom();
     },
@@ -132,7 +131,7 @@ Logger.prototype = {
                 'background: rgba(0,0,0,0.9);' +
                 'opacity: .9;' +
                 'overflow: auto;' +
-                'z-index: 9999;' +
+                'z-index: 9999999;' +
             '}' +
             '.logger-container .logger-message {' +
                 'font-size: ' + this.loggerStyles.font_size + ';' +
@@ -161,6 +160,6 @@ Logger.prototype = {
             '}';
         styles.type = 'text/css';
         this.headContainer.appendChild(styles);
-        styles.appendChild(document.createTextNode(stylesText))
+        styles.appendChild(document.createTextNode(stylesText));
     }
 };
