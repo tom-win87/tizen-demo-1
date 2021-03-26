@@ -1,14 +1,6 @@
 var DemoCMP = {},
-    logger = new Logger({debugMode: true}),
-    tileNavigation;
+    logger = new Logger({debugMode: true});
 
-DemoCMP.LoadCMP = function () {
-    tileNavigation = new Navigation();
-    try {
-        logger.debug('Widget version: '+ window.tizen.application.getAppInfo().version);
-    } catch (e) {
-        logger.debug(e);
-    }
-};
+DemoCMP.LoadCMP = function () {};
 
 window.onload = DemoCMP.LoadCMP();

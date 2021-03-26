@@ -1,35 +1,26 @@
-# Tizen Demo App
-Tizen Demo Web App that demonstrates ability to display integrated CMP
+# WebOS Demo App
+WebOS Demo Web App that demonstrates ability to display integrated CMP
 
 ## Requirements
-1. Tizen Studio
+1. WebOS SDK
 
 ## Import project
-If you already have Tizen Studio installed:
+If you already have WebOS IDE installed:
 1. Clone the repo to your workspace directory
-2. In Tizen Studio click File > Import menu item
-3. Choose the directory where you have just cloned the repo
-4. Select project to import from the list
+2. In WebOS IDE click `File > Import` menu item
+3. As source choose `Git`, then `Projects from Git > Existing local repository`
+4. Choose the repo from step 1
 
-## Running on the Samsung TV Simulator
-To run the application on the simulator:
-1. In the Project Explorer view, right-click the project and select Run As > Tizen Web Simulator Application (Samsung TV).
+## Running on the WebOS Emulator
+To run the application on the emulator:
+1. Turn on an Emulator machine
+2. In the IDE Targe manager menu connect to the emulator machine
+1. In the Project Explorer view of IDE, right-click the project and select `Run As / Debug As > webOS Application`
 
 # Useful links
-https://docs.tizen.org/application/web/get-started/overview/
-https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-simulator.html
-
-## Navigation class(navigation.js)
-Available methods:
-- `onLoad` runs on startup, trigger registerAllKey and bindEvents functions
-- `getViewportWindow` get window object of an iframe
-- `getActiveElement` get an active element of the document
-- `triggerClick` handle enter button pressed event
-- `registerAllKey` register all available keys of a remote control
-- `registerKey` register a button of a remote control by key name
-- `unregisterKey` unregister a button of a remote control by key name
-- `onKeyDownPress` handle pressed keys of a remote control
-- `bindEvents` add event listener from a remote control
+https://webostv.developer.lge.com/sdk/installation/
+https://webostv.developer.lge.com/sdk/tools/emulator/introduction-emulator/
+https://webostv.developer.lge.com/api/web-api/supported-standard-web-api/
 
 ## Implementation notes
 To make the consent manager work just include a bundle of scripts into your index.html:
@@ -49,11 +40,4 @@ To make the consent manager work just include a bundle of scripts into your inde
     }
 </script>
 <script src="https://cdn.privacy-mgmt.com/wrapperMessagingWithoutDetection.js"></script>
-```
-2. To get possibility navigate on the Privacy Manager include:
-```
-<script type="application/javascript">
-function Navigation(e){e=e||{},this.viewportModal=e.viewport||"[id^='sp_message_iframe_']",this.tvKey={KEY_ENTER:13,KEY_PAUSE:19,KEY_LEFT:37,KEY_UP:38,KEY_RIGHT:39,KEY_DOWN:40,KEY_0:48,KEY_1:49,KEY_2:50,KEY_3:51,KEY_4:52,KEY_5:53,KEY_6:54,KEY_7:55,KEY_8:56,KEY_9:57,KEY_EMPTY:189,KEY_RED:403,KEY_GREEN:404,KEY_YELLOW:405,KEY_BLUE:406,KEY_RW:412,KEY_STOP:413,KEY_PLAY:415,KEY_REC:416,KEY_FF:417,KEY_CH_UP:427,KEY_CH_DOWN:428,KEY_VOL_UP:447,KEY_VOL_DOWN:448,KEY_MUTE:449,KEY_INFO:457,KEY_GUIDE:458,KEY_RETURN:10009,KEY_SOURCE:10072,KEY_CHLIST:10073,KEY_MENU:10133,KEY_TOOLS:10135,KEY_ASPECT:10140,KEY_EMANUAL:10146,KEY_EXIT:10182,KEY_PRECH:10190,KEY_MTS:10195,KEY_3D:10199,KEY_TTX_MIX:10200,KEY_CAPTION:10221,KEY_SEARCH:10225,KEY_SOCCER:10228,KEY_REWIND_:10232,KEY_FF_:10233,KEY_PLAY_PAUSE:10252,KEY_EXTRA:10253},this.onLoad()}Navigation.prototype={onLoad:function(){this.registerKey("0"),this.registerKey("1"),this.bindEvents()},getViewportWindow:function(){const e=document.querySelector(this.viewportModal);return!!e&&e.contentWindow},getActiveElement:function(e=document.activeElement){const t=e.shadowRoot,i=e.contentDocument;return t&&t.activeElement?this.getActiveElement(t.activeElement):i&&i.activeElement?this.getActiveElement(i.activeElement):e},triggerClick:function(){const e=this.getActiveElement();let t=new Event("keydown",{bubbles:!0,cancelable:!0});t.keyCode=this.tvKey.KEY_ENTER,"font-weight: normal;"===e.style.cssText&&(t=new KeyboardEvent("keypress",{key:"Enter",bubbles:!0,charCode:0,keyCode:this.tvKey.KEY_ENTER})),e.dispatchEvent(t)},registerAllKey:function(){let e,t=window.tizen.tvinputdevice.getSupportedKeys();for(e=0;e<t.length;e+=1){try{this.registerKey(t[e].name)}catch(i){logger.error("[registerAllKey] Failed to register "+t[e].name)}this.tvKey[t[e].code]=t[e].name}logger.debug("[registerAllKey] Register all supported keys. [available:"+t.length+"; registered:"+e+"]")},registerKey:function(e){window.tizen.tvinputdevice.registerKey(e)},unregisterKey:function(e){window.tizen.tvinputdevice.unregisterKey(e)},onKeyDownPress:function(e){const t=tileNavigation.getViewportWindow();switch(e.keyCode){case tileNavigation.tvKey.KEY_ENTER:t&&tileNavigation.triggerClick();break;case tileNavigation.tvKey.KEY_EXIT:window.tizen.application.getCurrentApplication().exit();break;case tileNavigation.tvKey.KEY_1:logger.toolbarToggle();break;case tileNavigation.tvKey.KEY_0:window.location.reload();break;default:if(t){const i=new Event("keydown",{bubbles:!0,cancelable:!0});i.currentTarget=e.currentTarget,i.keyCode=e.keyCode,t.dispatchEvent(i)}}},bindEvents:function(){window.addEventListener("keydown",this.onKeyDownPress)}};
-var tileNavigation,DemoCMP={},logger=new Logger({debugMode:!0});DemoCMP.LoadCMP=function(){tileNavigation=new Navigation;try{logger.debug("Widget version: "+window.tizen.application.getAppInfo().version)}catch(o){logger.debug(o)}},window.onload=DemoCMP.LoadCMP();
-</script>
 ```
