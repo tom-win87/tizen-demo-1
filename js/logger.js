@@ -26,22 +26,12 @@ Logger.prototype = {
         that.info('Log Started at', that.getDate(), that.getTime());
     },
     pretty_print: function (obj) {
-        let output = '';
         if (typeof(obj) === 'string') return obj;
-        for (let prop in obj) {
-            if (obj.hasOwnProperty(prop)) {
-                switch (typeof(obj[prop])) {
-                    case 'object':
-                        output += "=" + this.pretty_print(obj[prop]);
-                        break;
-                    case 'function':
-                        break;
-                    default:
-                        output += JSON.stringify(obj[prop]);
-                }
-            }
-        }
-        return output;
+        Object.getOwnPropertyNames(obj).forEach(
+          function (val, idx, array) {
+              logger.log(val + ' = ' + obj[val]);
+          }
+        );
     },
 
     log: function(level, ...msgs) {

@@ -129,9 +129,7 @@ Navigation.prototype = {
      * Handles remotes key press event.
      * Dispatch fired event to the iframe window.
      */
-    onKeyDownPress: function(event) {
-        // logger.debug('[onKeyDownPress] Pressed key code:' + event.keyCode);
-        // console.log('keydown', event);
+    onKeyDown: function(event) {
         const iframeWindow = tileNavigation.getViewportWindow();
         switch (event.keyCode) {
             case tileNavigation.tvKey.KEY_ENTER:
@@ -159,6 +157,6 @@ Navigation.prototype = {
         }
     },
     bindEvents: function() {
-        window.addEventListener('keydown', this.onKeyDownPress);
+        window.addEventListener('keydown', this.onKeyDown);
     }
 };
