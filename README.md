@@ -28,7 +28,7 @@ Available methods:
 - `registerAllKey` register all available keys of a remote control
 - `registerKey` register a button of a remote control by key name
 - `unregisterKey` unregister a button of a remote control by key name
-- `onKeyDownPress` handle pressed keys of a remote control
+- `onKeyDown` handle pressed keys of a remote control
 - `bindEvents` add event listener from a remote control
 
 ## Implementation notes
