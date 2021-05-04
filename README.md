@@ -43,14 +43,14 @@ To make the consent manager work just include a bundle of scripts into your inde
   window._sp_ = {
       config: {
           accountId: 22,
-          baseEndpoint: 'https://cdn.sp-stage.net',
+          baseEndpoint: 'https://cdn.privacy-mgmt.com',
           propertyHref: 'http://tizen.app.com',
           gdpr: { },
           env: 'stage'
       }
 }
 </script>
-<script src="https://tcfv2-staging-script.s3.amazonaws.com/multicampaign/3.0.0/wrapperMessagingWithoutDetection.js" async></script>
+<script src="https://cdn.privacy-mgmt.com/wrapperMessagingWithoutDetection.js">
 ```
 2. To get possibility navigate on the Privacy Manager include:
 ```
