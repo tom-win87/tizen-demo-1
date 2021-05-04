@@ -45,8 +45,7 @@ To make the consent manager work just include a bundle of scripts into your inde
           accountId: 22,
           baseEndpoint: 'https://cdn.privacy-mgmt.com',
           propertyHref: 'http://tizen.app.com',
-          gdpr: { },
-          env: 'stage'
+          gdpr: { }
       }
 }
 </script>
