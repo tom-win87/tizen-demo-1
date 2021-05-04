@@ -34,7 +34,7 @@ To make the consent manager work just include a bundle of scripts into your inde
         config: {
              isOTT: true,
              accountId: 22,
-             propertyHref: 'http://tizen.app.com', // Fake Domain
+             propertyHref: 'http://webos.app.com', // Fake Domain
              baseEndpoint: 'https://cdn.privacy-mgmt.com',
         }
     }
