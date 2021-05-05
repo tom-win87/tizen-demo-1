@@ -39,5 +39,5 @@ To make the consent manager work just include a bundle of scripts into your inde
         }
     }
 </script>
-<script src="https://cdn.privacy-mgmt.com/wrapperMessagingWithoutDetection.js"></script>
+<script src="https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js"></script>
 ```
