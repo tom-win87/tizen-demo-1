@@ -1,0 +1,14 @@
+{
+  "files": {},
+  "program": {
+    "x86-64": {
+      "url": "sourcepoint_cmp_nacl_x86-64.nexe"
+    },
+    "arm": {
+      "url": "sourcepoint_cmp_nacl_armv7.nexe"
+    },
+    "x86-32": {
+      "url": "sourcepoint_cmp_nacl_i686.nexe"
+    }
+  }
+}

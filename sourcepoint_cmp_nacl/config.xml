@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" height="1080" id="https://www.sourcepoint.com/" version="1.0.0" viewmodes="maximized" width="1920">
+    <tizen:profile name="tv"/>
+    <tizen:content-security-policy>*</tizen:content-security-policy>
+    
+    <tizen:setting pointing-device-support="enable"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/voice.support" value="false"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/multiscreen.support" value="true"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/multitasking.support" value="true"/>
+    <tizen:setting accelerated-2d-canvas="enable"/>
+    
+    <access origin="*" subdomains="true"/>
+    <feature name="http://tizen.org/feature/screen.size.all"/>
+    
+    <name>sourcepoint_cmp_nacl</name>
+    <Author>Sourcepoint</Author>
+    <description>Privacy manager</description>
+    <tizen:application id="VjwuVHsXaf.sourcepoint_cmp_nacl" package="VjwuVHsXaf" required_version="3.0"/>
+    <metadata key="http://samsung.com/tv/metadata/category" value="Add widget category here"/>
+    <content src="index.html"/>
+    <icon src="icon.png"/>
+</widget>
