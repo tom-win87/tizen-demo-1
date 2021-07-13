@@ -51,6 +51,19 @@ To make the consent manager work just include a bundle of scripts into your inde
 </script>
 <script src="https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js"></script>
 ```
+
+**Note**: If you are utilizing the Tizen SDK as a solution for devices running on the Metrological Lightning Framework (e.g. Comcast X1), you will need to add `disableLocalStorage: true` to your configuration. This extra configuration will disable the storage of data in the browser's local storage, which is a requirement for some devices running Metrological Lightning Framework. Please be aware that this configuration will also limit scenario functionality. Talk to your Account Manager to learn more. 
+```
+  window._sp_ = {
+      config: {
+          accountId: 22,
+          baseEndpoint: 'https://cdn.privacy-mgmt.com',
+          propertyHref: 'http://tizen.app.com',
+          disableLocalStorage: true,
+          gdpr: { }
+      }
+```
+
 2. To get possibility navigate on the Privacy Manager include:
 ```
 <script type="application/javascript">
