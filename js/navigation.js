@@ -3,12 +3,7 @@ function Navigation (options) {
     this.viewportModal = options.viewport || "[id^='sp_message_iframe_']";
     this.tvKey = {
         KEY_ENTER: 13,          // Enter
-        KEY_LEFT: 37,           // ArrowLeft
-        KEY_UP: 38,             // ArrowUp
-        KEY_RIGHT: 39,          // ArrowRight
-        KEY_DOWN: 40,           // ArrowDown
         KEY_0: 48,              // 0
-        KEY_1: 49,              // 1
         KEY_RETURN: 10009,      // Back
         KEY_EXIT: 10182,        // Exit
     };
@@ -18,7 +13,6 @@ function Navigation (options) {
 Navigation.prototype = {
     onLoad: function () {
         this.registerKey('0');
-        this.registerKey('1');
         this.bindEvents();
     },
     /**
@@ -59,24 +53,6 @@ Navigation.prototype = {
         }
         activeElement.dispatchEvent(enterEvent);
     },
-    /**
-     * Registers all supported input device keys to receive DOM keyboard events
-     * when they are pressed or released.
-     * Additionally stores information about registered keys in object.
-     */
-    registerAllKey: function () {
-        let supportedKeys = window.tizen.tvinputdevice.getSupportedKeys(), i;
-        for (i = 0; i < supportedKeys.length; i += 1) {
-            try {
-                this.registerKey(supportedKeys[i].name);
-            } catch (e) {
-                logger.error('[registerAllKey] Failed to register ' + supportedKeys[i].name);
-            }
-            this.tvKey[supportedKeys[i].code] = supportedKeys[i].name;
-        }
-        logger.debug("[registerAllKey] Register all supported keys. [available:" + supportedKeys.length + "; registered:" + i + "]");
-    },
-
     registerKey: function (keyName) {
         window.tizen.tvinputdevice.registerKey(keyName);
     },
@@ -98,9 +74,6 @@ Navigation.prototype = {
                 break;
             case tileNavigation.tvKey.KEY_EXIT:
                 window.tizen.application.getCurrentApplication().exit();
-                break;
-            case tileNavigation.tvKey.KEY_1:
-                logger.toolbarToggle();
                 break;
             case tileNavigation.tvKey.KEY_0:
                 window.location.reload();
