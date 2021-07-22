@@ -4,3 +4,4 @@
 .project
 .tproject
 *.wgt
+.sdk_delta.info
