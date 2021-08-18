@@ -1,1 +1,2 @@
-window.onload = function () { window.tileNavigation = new Navigation();};
+var tileNavigation;
+window.onload = function () { tileNavigation = new Navigation();};

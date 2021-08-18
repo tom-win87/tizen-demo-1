@@ -3,49 +3,42 @@ function Navigation (options) {
     this.viewportModal = options.viewport || "[id^='sp_message_iframe_']";
     this.tvKey = {
         KEY_ENTER: 13,          // Enter           0x0D
-        KEY_PAUSE: 19,          // MediaPause
-        KEY_LEFT: 37,           // ArrowLeft       0x25
-        KEY_UP: 38,             // ArrowUp         0x26
-        KEY_RIGHT: 39,          // ArrowRight      0x27
-        KEY_DOWN: 40,           // ArrowDown       0x28
         KEY_BACK: 461,          // Back            0x1CD
-
         KEY_0: 48,              // 0
-        KEY_1: 49,              // 1
-        KEY_2: 50,              // 2
-        KEY_3: 51,              // 3
-        KEY_4: 52,              // 4
-        KEY_5: 53,              // 5
-        KEY_6: 54,              // 6
-        KEY_7: 55,              // 7
-        KEY_8: 56,              // 8
-        KEY_9: 57,              // 9
-        KEY_RED: 403,           // ColorF0Red      0x193
-        KEY_GREEN: 404,         // ColorF1Green    0x194
-        KEY_YELLOW: 405,        // ColorF2Yellow   0x195
-        KEY_BLUE: 406,          // ColorF3Blue     0x196
     };
     this.onLoad();
 }
 
 Navigation.prototype = {
     onLoad: function () {
-        var lunaReq= webOS.service.request("luna://com.webos.service.tv.systemproperty", {
-            method:"getSystemInfo",
-            parameters: {"keys": ["modelName", "firmwareVersion", "UHD", "sdkVersion"]},
-            onSuccess: function (args) {
-                console.log("sdkVersion: ", args.sdkVersion);
-            },
-            onFailure: function (args) { console.log("Error calling LUNA service"); }
-        });
+        try{
+            webOS.fetchAppInfo(function (info) {
+                console.log('Widget version: ', info.version);
+            }, webOS.fetchAppRootPath() + 'appinfo.json');
+            
+            webOS.deviceInfo(function (info) {
+                console.log('Model name:', info.modelName);
+                console.log('Platform:', info.sdkVersion);
+            });
+        } catch (e) {
+            console.log('Something goes wrong on getting an application info');
+        }
         this.bindEvents();
     },
     /**
       * Returns the window object of an iframe from options
       */
-    getViewportWindow: function () {
-        const viewport = document.querySelector(this.viewportModal);
-        return !!viewport ? viewport.contentWindow : false;
+    getViewportWindow: function (retriesCounter) {
+        if (typeof(retriesCounter) === "undefined") { retriesCounter = 0; }
+        var that = this;
+        var viewport = document.querySelector(this.viewportModal);
+        retriesCounter = retriesCounter + 1;
+        if (retriesCounter <= 5) {
+            setTimeout(function () {
+                (viewport === null) ? that.getViewportWindow(retriesCounter) : viewport = viewport.contentWindow;
+            }, 1000);
+        }
+        return viewport;
     },
     /**
       * Returns the active element of a page,
@@ -64,15 +57,24 @@ Navigation.prototype = {
         }
         return element;
     },
+    getBackButton: function (){
+        var iframeWindow = tileNavigation.getViewportWindow(),
+            backButtonCollection = iframeWindow.contentDocument.body.querySelectorAll('div.message-component.message-button'),
+            returnButtonCollection = iframeWindow.contentDocument.body.querySelectorAll('div.back-button.focusable');
+        return !!backButtonCollection.length ? backButtonCollection[0] : !!returnButtonCollection.length ? returnButtonCollection[0] : null;
+    },
     /**
      * Dispatch enter button event on an active DOM element
      */
-    triggerClick: function(){
-        const activeElement = this.getActiveElement();
+    triggerClick: function(activeElement){
+        if (typeof (activeElement) === "undefined" ) { activeElement = this.getActiveElement(); }
         var enterEvent = new Event('keydown', {bubbles: true, cancelable: true});
         enterEvent.keyCode = this.tvKey.KEY_ENTER;
-        if (activeElement.style.cssText === 'font-weight: normal;'){
+        if (activeElement.parentElement.className.split(' ').indexOf('categories') >= 0 ){
             enterEvent = new KeyboardEvent('keypress',{key: 'Enter', bubbles: true, charCode: 0, keyCode: this.tvKey.KEY_ENTER});
+        }
+        if (activeElement.tagName === 'BUTTON' && activeElement.className.split(' ').indexOf('message-button') >=0){
+            enterEvent = new KeyboardEvent('keydown',{key: 'Enter', bubbles: true, charCode: 0, keyCode: this.tvKey.KEY_ENTER, code: "Enter"});
         }
         activeElement.dispatchEvent(enterEvent);
     },
@@ -81,40 +83,21 @@ Navigation.prototype = {
      * Dispatch fired event to the iframe window.
      */
     onKeyDown: function(event) {
-        const iframeWindow =  window.tileNavigation.getViewportWindow();
-        switch (event.keyCode) {
-            case  window.tileNavigation.tvKey.KEY_ENTER:
-                if (!!iframeWindow) {
-                     window.tileNavigation.triggerClick();
-                }
-                break;
-            default:
-                if (!!iframeWindow){
-                    const evnt = new Event('keydown', {'bubbles': true, 'cancelable': true});
-                    evnt.currentTarget = event.currentTarget;
-                    evnt.keyCode = event.keyCode;
-                    iframeWindow.dispatchEvent(evnt);
-                }
-                break;
-        }
-    },
-    onMouseClick: function(event) {
-        const iframeWindow = window.tileNavigation.getViewportWindow();
-        if (!!iframeWindow){
-            const evnt = new Event('keydown', {'bubbles': true, 'cancelable': true});
-            evnt.currentTarget = event.currentTarget;
-            evnt.keyCode = event.keyCode;
-            iframeWindow.dispatchEvent(evnt);
+        if (event.keyCode === tileNavigation.tvKey.KEY_BACK) {
+            var backButton = tileNavigation.getBackButton();
+            if (backButton){
+                backButton.focus();
+                tileNavigation.triggerClick(backButton);
+            } else {
+                webOS.platformBack();
+            }
         }
     },
     bindEvents: function() {
-        const iframeWindow = window.tileNavigation.getViewportWindow();
-        console.log("[bindEvents] iframeWindow: ", iframeWindow);
-        document.addEventListener('click', this.onMouseClick);
-        document.addEventListener('keydown', this.onKeyDown);
-
-        window.addEventListener('popstate', function (event) {
-            webOS.platformBack();
-        }, false);
+        var that = this;
+        window.setTimeout(function(){
+            var iframeWindow = tileNavigation.getViewportWindow();
+            iframeWindow.contentDocument.body.addEventListener('keydown', that.onKeyDown);
+        }, 3000);
     }
 };
