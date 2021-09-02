@@ -22,7 +22,7 @@ https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-simul
 
 ## Navigation class(navigation.js)
 Available methods:
-- `onLoad` runs on startup, trigger registerAllKey and bindEvents functions
+- `onLoad` runs on startup, trigger registerKey and bindEvents functions
 - `getViewportWindow` get window object of an iframe
 - `getActiveElement` get an active element of the document
 - `triggerClick` handle enter button pressed event

@@ -27,7 +27,8 @@ Navigation.prototype = {
       * regardless of shadow root or iframe window.
       * @returns {HTMLElement}
       */
-    getActiveElement: function (element = document.activeElement ) {
+    getActiveElement: function ( element ) {
+        if (!element) {element = document.activeElement;}
         const shadowRoot = element.shadowRoot;
         const contentDocument = element.contentDocument;
         if (shadowRoot && shadowRoot.activeElement) {
@@ -43,7 +44,7 @@ Navigation.prototype = {
      */
     triggerClick: function(){
         const activeElement = this.getActiveElement();
-        let enterEvent = new Event('keydown', {bubbles: true, cancelable: true});
+        var enterEvent = new Event('keydown', {bubbles: true, cancelable: true});
         enterEvent.keyCode = this.tvKey.KEY_ENTER;
         if (activeElement.parentElement.className.split(' ').indexOf('categories') >= 0 ){
             enterEvent = new KeyboardEvent('keypress',{key: 'Enter', bubbles: true, charCode: 0, keyCode: this.tvKey.KEY_ENTER});
