@@ -2,6 +2,7 @@ function Navigation (options) {
     options = options ? options : {};
     this.viewportModal = options.viewport || "[id^='sp_message_iframe_']";
     this.tvKey = {
+        KEY_BACK_KEYBOARD: 8,   // Back
         KEY_ENTER: 13,          // Enter           0x0D
         KEY_BACK: 461,          // Back            0x1CD
         KEY_0: 48,              // 0
@@ -83,7 +84,7 @@ Navigation.prototype = {
      * Dispatch fired event to the iframe window.
      */
     onKeyDown: function(event) {
-        if (event.keyCode === tileNavigation.tvKey.KEY_BACK) {
+        if (event.keyCode === tileNavigation.tvKey.KEY_BACK || event.keyCode === tileNavigation.tvKey.KEY_BACK_KEYBOARD) {
             var backButton = tileNavigation.getBackButton();
             if (backButton){
                 backButton.focus();
