@@ -34,7 +34,7 @@ Navigation.prototype = {
         var that = this;
         var viewport = document.querySelector(this.viewportModal);
         retriesCounter = retriesCounter + 1;
-        if (retriesCounter <= 5) {
+        if (retriesCounter <= 3) {
             setTimeout(function () {
                 (viewport === null) ? that.getViewportWindow(retriesCounter) : viewport = viewport.contentWindow;
             }, 1000);
@@ -74,8 +74,8 @@ Navigation.prototype = {
         if (activeElement.parentElement.className.split(' ').indexOf('categories') >= 0 ){
             enterEvent = new KeyboardEvent('keypress',{key: 'Enter', bubbles: true, charCode: 0, keyCode: this.tvKey.KEY_ENTER});
         }
-        if (activeElement.tagName === 'BUTTON' && activeElement.className.split(' ').indexOf('message-button') >=0){
-            enterEvent = new KeyboardEvent('keydown',{key: 'Enter', bubbles: true, charCode: 0, keyCode: this.tvKey.KEY_ENTER, code: "Enter"});
+        if (activeElement.tagName === 'BUTTON' && activeElement.className.split(' ').indexOf('ott-switch') >=0){
+            return;
         }
         activeElement.dispatchEvent(enterEvent);
     },
@@ -94,11 +94,17 @@ Navigation.prototype = {
             }
         }
     },
+    onClick: function(event){
+        tileNavigation.triggerClick();
+    },
     bindEvents: function() {
         var that = this;
-        window.setTimeout(function(){
+        window.setTimeout(function() {
             var iframeWindow = tileNavigation.getViewportWindow();
-            iframeWindow.contentDocument.body.addEventListener('keydown', that.onKeyDown);
+            if (!!iframeWindow){
+                iframeWindow.contentDocument.body.addEventListener('keydown', that.onKeyDown);
+                iframeWindow.contentDocument.body.addEventListener('click', that.onClick);
+            }
         }, 3000);
     }
 };
